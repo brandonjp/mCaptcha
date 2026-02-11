@@ -1,5 +1,15 @@
 ## 0.1.0(unreleased)
 
+### Added
+
+-   Auto-favicon widget logo: set `MCAPTCHA_logo_USE_FAVICON=true` to
+    automatically display the embedding site's favicon in the CAPTCHA
+    widget. Tries native `/favicon.ico`, DuckDuckGo icons, then Google
+    favicon API, with graceful fallback.
+-   Custom logo/branding env vars: `MCAPTCHA_logo_URL`,
+    `MCAPTCHA_logo_BRAND_NAME`, `MCAPTCHA_logo_BRAND_LINK` for static
+    widget branding overrides without database changes.
+
 ### Changed
 
 -   2023-10-18: Environment variable names have changed, please see

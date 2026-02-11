@@ -121,4 +121,47 @@ export const solveCaptchaRunner = async (worker: Worker, e: Event): Promise<void
   }
 };
 
+/** Try to load the embedding site's favicon as the widget logo.
+ *  Uses document.referrer to detect the parent site's domain,
+ *  then tries multiple favicon sources with graceful fallback. */
+const applyFavicon = (): void => {
+  const details = document.querySelector(".widget__mcaptcha-details");
+  if (!details || details.getAttribute("data-use-favicon") !== "true") return;
+
+  const referrer = document.referrer;
+  if (!referrer) return;
+
+  try {
+    const domain = new URL(referrer).hostname;
+    if (!domain) return;
+
+    const logoImg = document.querySelector(".widget__mcaptcha-logo") as HTMLImageElement;
+    if (!logoImg) return;
+
+    const originalSrc = logoImg.src;
+
+    const sources = [
+      `https://${domain}/favicon.ico`,
+      `https://icons.duckduckgo.com/ip3/${domain}.ico`,
+      `https://www.google.com/s2/favicons?domain=${domain}&sz=64`,
+    ];
+
+    let idx = 0;
+    const tryNext = () => {
+      if (idx >= sources.length) {
+        logoImg.src = originalSrc;
+        return;
+      }
+      const img = new Image();
+      img.onload = () => { logoImg.src = sources[idx]; };
+      img.onerror = () => { idx++; tryNext(); };
+      img.src = sources[idx];
+    };
+    tryNext();
+  } catch {
+    // invalid referrer URL, keep original logo
+  }
+};
+
 registerVerificationEventHandler();
+applyFavicon();
