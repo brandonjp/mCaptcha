@@ -101,6 +101,15 @@ pub struct Survey {
 }
 
 #[derive(Debug, Clone, Deserialize, Eq, PartialEq)]
+pub struct Logo {
+    pub url: Option<String>,
+    pub brand_name: Option<String>,
+    pub brand_link: Option<String>,
+    pub use_favicon: Option<bool>,
+    pub favicon_providers: Option<String>,
+}
+
+#[derive(Debug, Clone, Deserialize, Eq, PartialEq)]
 pub struct Settings {
     pub debug: bool,
     pub commercial: bool,
@@ -113,9 +122,10 @@ pub struct Settings {
     pub server: Server,
     pub captcha: Captcha,
     pub smtp: Option<Smtp>,
+    pub logo: Option<Logo>,
 }
 
-const ENV_VAR_CONFIG: [(&str, &str); 32] = [
+const ENV_VAR_CONFIG: [(&str, &str); 37] = [
     /* top-level */
     ("debug", "MCAPTCHA_debug"),
     ("commercial", "MCAPTCHA_commercial"),
@@ -165,7 +175,12 @@ const ENV_VAR_CONFIG: [(&str, &str); 32] = [
     ("smtp.password", "MCAPTCHA_smtp_PASSWORD"),
     ("smtp.port", "MCAPTCHA_smtp_PORT"),
 
-
+    /* logo */
+    ("logo.url", "MCAPTCHA_logo_URL"),
+    ("logo.brand_name", "MCAPTCHA_logo_BRAND_NAME"),
+    ("logo.brand_link", "MCAPTCHA_logo_BRAND_LINK"),
+    ("logo.use_favicon", "MCAPTCHA_logo_USE_FAVICON"),
+    ("logo.favicon_providers", "MCAPTCHA_logo_FAVICON_PROVIDERS"),
 
 ];
 
@@ -205,6 +220,22 @@ const DEPRECATED_ENV_VARS: [(&str, &str); 23] = [
 ];
 
 impl Settings {
+    pub fn get_logo_url(&self) -> Option<&str> {
+        self.logo.as_ref().and_then(|l| l.url.as_deref())
+    }
+    pub fn get_brand_name(&self) -> &str {
+        self.logo.as_ref().and_then(|l| l.brand_name.as_deref()).unwrap_or("mCaptcha")
+    }
+    pub fn get_brand_link(&self) -> &str {
+        self.logo.as_ref().and_then(|l| l.brand_link.as_deref()).unwrap_or(crate::PKG_HOMEPAGE)
+    }
+    pub fn get_use_favicon(&self) -> bool {
+        self.logo.as_ref().and_then(|l| l.use_favicon).unwrap_or(false)
+    }
+    pub fn get_favicon_providers(&self) -> &str {
+        self.logo.as_ref().and_then(|l| l.favicon_providers.as_deref()).unwrap_or("direct")
+    }
+
     pub fn new() -> Result<Self, ConfigError> {
         let mut s = Config::builder();
 

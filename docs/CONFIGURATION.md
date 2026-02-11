@@ -82,3 +82,13 @@ See commits [`54b14291ec140e`](https://github.com/mCaptcha/mCaptcha/commit/54b14
 | `MCAPTCHA_smtp_PORT`     | SMTP server port                                |
 | `MCAPTCHA_smtp_USERNAME` | SMTP username                                   |
 | `MCAPTCHA_smtp_PASSWORD` | SMTP password                                   |
+
+### Logo / Branding
+
+| Name                        | Value                                                                                                                     |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `MCAPTCHA_logo_URL`         | URL to a custom logo image to replace the default mCaptcha logo in the widget                                             |
+| `MCAPTCHA_logo_BRAND_NAME`  | Custom brand name shown under the logo in the widget (defaults to "mCaptcha")                                             |
+| `MCAPTCHA_logo_BRAND_LINK`  | Custom URL the widget logo links to (defaults to mCaptcha homepage)                                                       |
+| `MCAPTCHA_logo_USE_FAVICON` | Set to `true` to auto-detect and display the embedding site's favicon as the widget logo. Falls back to `MCAPTCHA_logo_URL` or the default logo on failure |
+| `MCAPTCHA_logo_FAVICON_PROVIDERS` | Comma-separated list of favicon providers to try, in order. Available: `direct`, `duckduckgo`, `google`, `iconhorse`, `favicone`, `all`. Default: `direct` (only fetches `/favicon.ico` from the site itself — no third-party requests) |

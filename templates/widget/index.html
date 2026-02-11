@@ -29,27 +29,39 @@ SPDX-License-Identifier: MIT OR Apache-2.0
               class="widget__verification-checkbox"
           type="checkbox" />
         </label>
-        <div class="widget__mcaptcha-details">
-          <a href="<.= crate::PKG_HOMEPAGE .>" 
+        <div class="widget__mcaptcha-details" data-use-favicon="<.= crate::SETTINGS.get_use_favicon() .>" data-favicon-providers="<.= crate::SETTINGS.get_favicon_providers() .>">
+          <a href="<.= crate::SETTINGS.get_brand_link() .>"
               class="widget__mcaptcha-logo-container"
               target="_blank"
+              rel="noopener noreferrer"
+              aria-label="<.= crate::SETTINGS.get_brand_name() .> - powered by mCaptcha"
            >
+            <. if let Some(logo_url) = crate::SETTINGS.get_logo_url() { .>
+            <img
+              class="widget__mcaptcha-logo"
+              src="<.= logo_url .>"
+              alt="<.= crate::SETTINGS.get_brand_name() .>"
+            />
+            <. } else { .>
             <img
               class="widget__mcaptcha-logo"
               src="<.= crate::FILES.get("./static/cache/img/icon-trans.png").unwrap().>"
               alt="mCaptcha logo"
             />
-            <p class="widget__mcaptcha-brand-name">mCaptcha</p>
+            <. } .>
+            <p class="widget__mcaptcha-brand-name"><.= crate::SETTINGS.get_brand_name() .></p>
           </a>
           <div class="widget__mcaptcha-info-container">
             <a class="widget__mcaptcha-info-link"
               target="_blank"
-              href="<.= crate::PKG_HOMEPAGE .><.= crate::PAGES.privacy .>">
+              rel="noopener noreferrer"
+              href="<.= crate::SETTINGS.get_brand_link() .><.= crate::PAGES.privacy .>">
               Privacy
             </a>
             <a class="widget__mcaptcha-info-link"
               target="_blank"
-              href="<.= crate::PKG_HOMEPAGE .><.= crate::PAGES.security .>">
+              rel="noopener noreferrer"
+              href="<.= crate::SETTINGS.get_brand_link() .><.= crate::PAGES.security .>">
               Terms
             </a>
           </div>

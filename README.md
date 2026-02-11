@@ -22,6 +22,91 @@ Proof of work based, privacy respecting CAPTCHA system with a kickass UX.
 
 </div>
 
+---
+
+## Fork: Widget Favicon from Embedding Site
+
+> **This is a fork of [mCaptcha/mCaptcha](https://github.com/mCaptcha/mCaptcha).**
+
+### What this fork adds
+
+When a site embeds the mCaptcha widget, this fork can automatically display that site's favicon in the widget instead of the default mCaptcha logo. It detects the embedding site's domain via `document.referrer` and fetches the favicon from configurable sources.
+
+By default, only the site's own `/favicon.ico` is tried (no third-party requests). You can optionally enable external favicon services (DuckDuckGo, Google, Icon Horse, Favicone) as fallbacks if the direct favicon isn't available.
+
+It also exposes a few environment variables to override the widget's logo URL, brand name, and brand link.
+
+#### Environment variables
+
+| Variable | Description |
+|---|---|
+| `MCAPTCHA_logo_USE_FAVICON` | Set to `true` to auto-detect the embedding site's favicon as the widget logo. Falls back to `MCAPTCHA_logo_URL` (if set) or the default mCaptcha logo on failure. |
+| `MCAPTCHA_logo_FAVICON_PROVIDERS` | Comma-separated list of favicon sources to try, in order. Available: `direct`, `duckduckgo`, `google`, `iconhorse`, `favicone`, `all`. Default: `direct` (only fetches `/favicon.ico` from the site itself — no third-party requests). |
+| `MCAPTCHA_logo_URL` | Static logo URL — overrides the default mCaptcha logo in the widget |
+| `MCAPTCHA_logo_BRAND_NAME` | Brand name shown under the logo (defaults to `"mCaptcha"`) |
+| `MCAPTCHA_logo_BRAND_LINK` | URL the widget logo links to (defaults to mCaptcha homepage) |
+
+### Docker image
+
+This fork publishes Docker images to GitHub Container Registry:
+
+```
+ghcr.io/brandonjp/mcaptcha:latest
+```
+
+#### Docker Compose example
+
+```yaml
+version: "3.9"
+
+services:
+  mcaptcha:
+    image: ghcr.io/brandonjp/mcaptcha:latest
+    ports:
+      - 7000:7000
+    depends_on:
+      - mcaptcha_postgres
+      - mcaptcha_redis
+    environment:
+      # Server
+      MCAPTCHA_server_DOMAIN: mcaptcha.example.com
+      MCAPTCHA__server_COOKIE_SECRET: change-me-to-a-random-string-min-32-chars
+      MCAPTCHA__server_IP: 0.0.0.0
+      MCAPTCHA__server_PROXY_HAS_TLS: "true"
+      PORT: "7000"
+      # Database
+      DATABASE_URL: postgres://mcaptcha:password@mcaptcha_postgres:5432/mcaptcha
+      MCAPTCHA_database_POOL: "4"
+      # Redis
+      MCAPTCHA_redis_URL: redis://mcaptcha_redis
+      MCAPTCHA_redis_POOL: "4"
+      # Captcha
+      MCAPTCHA_captcha_SALT: change-me-to-a-random-string-min-32-chars
+      # Favicon / Branding (optional)
+      MCAPTCHA_logo_USE_FAVICON: "true"
+      # MCAPTCHA_logo_FAVICON_PROVIDERS: "direct"  # default; use "all" to enable third-party fallbacks
+      MCAPTCHA_logo_BRAND_NAME: "Secured by mCaptcha"
+      MCAPTCHA_logo_BRAND_LINK: "https://mcaptcha.org"
+      # MCAPTCHA_logo_URL: "https://example.com/your-logo.png"
+
+  mcaptcha_postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: mcaptcha
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mcaptcha
+    volumes:
+      - mcaptcha-data:/var/lib/postgresql
+
+  mcaptcha_redis:
+    image: mcaptcha/cache:latest
+
+volumes:
+  mcaptcha-data:
+```
+
+---
+
 **Skip to [demo](#demo)**
 
 [mCaptcha](https://mcaptcha.org) is a privacy respecting, _free_ CAPTCHA
