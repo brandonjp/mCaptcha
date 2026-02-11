@@ -121,9 +121,37 @@ export const solveCaptchaRunner = async (worker: Worker, e: Event): Promise<void
   }
 };
 
+/** Map of provider names to URL templates.
+ *  Each function takes a domain and returns the favicon URL. */
+const FAVICON_PROVIDERS: Record<string, (domain: string) => string> = {
+  direct: (d) => `https://${d}/favicon.ico`,
+  duckduckgo: (d) => `https://icons.duckduckgo.com/ip3/${d}.ico`,
+  google: (d) => `https://www.google.com/s2/favicons?domain=${d}&sz=64`,
+  iconhorse: (d) => `https://icon.horse/icon/${d}`,
+  favicone: (d) => `https://favicone.com/${d}`,
+};
+
+const ALL_PROVIDER_NAMES = Object.keys(FAVICON_PROVIDERS);
+
+/** Parse the comma-separated providers string into an ordered list of URL builders. */
+const resolveProviders = (raw: string): Array<(domain: string) => string> => {
+  const names = raw.split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
+  const resolved: Array<(domain: string) => string> = [];
+  for (const name of names) {
+    if (name === "all") {
+      for (const n of ALL_PROVIDER_NAMES) {
+        resolved.push(FAVICON_PROVIDERS[n]);
+      }
+    } else if (FAVICON_PROVIDERS[name]) {
+      resolved.push(FAVICON_PROVIDERS[name]);
+    }
+  }
+  return resolved;
+};
+
 /** Try to load the embedding site's favicon as the widget logo.
  *  Uses document.referrer to detect the parent site's domain,
- *  then tries multiple favicon sources with graceful fallback. */
+ *  then tries the configured favicon providers with graceful fallback. */
 const applyFavicon = (): void => {
   const details = document.querySelector(".widget__mcaptcha-details");
   if (!details || details.getAttribute("data-use-favicon") !== "true") return;
@@ -139,12 +167,12 @@ const applyFavicon = (): void => {
     if (!logoImg) return;
 
     const originalSrc = logoImg.src;
+    const providersAttr = details.getAttribute("data-favicon-providers") || "direct";
+    const providers = resolveProviders(providersAttr);
 
-    const sources = [
-      `https://${domain}/favicon.ico`,
-      `https://icons.duckduckgo.com/ip3/${domain}.ico`,
-      `https://www.google.com/s2/favicons?domain=${domain}&sz=64`,
-    ];
+    if (providers.length === 0) return;
+
+    const sources = providers.map((fn) => fn(domain));
 
     let idx = 0;
     const tryNext = () => {

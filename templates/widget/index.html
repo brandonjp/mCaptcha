@@ -29,7 +29,7 @@ SPDX-License-Identifier: MIT OR Apache-2.0
               class="widget__verification-checkbox"
           type="checkbox" />
         </label>
-        <div class="widget__mcaptcha-details" data-use-favicon="<.= crate::SETTINGS.get_use_favicon() .>">
+        <div class="widget__mcaptcha-details" data-use-favicon="<.= crate::SETTINGS.get_use_favicon() .>" data-favicon-providers="<.= crate::SETTINGS.get_favicon_providers() .>">
           <a href="<.= crate::SETTINGS.get_brand_link() .>"
               class="widget__mcaptcha-logo-container"
               target="_blank"

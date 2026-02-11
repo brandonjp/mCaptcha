@@ -24,22 +24,27 @@ Proof of work based, privacy respecting CAPTCHA system with a kickass UX.
 
 ---
 
-## Fork: Custom Branding & Favicon Support
+## Fork: Widget Favicon from Embedding Site
 
-> **This is a fork of [mCaptcha/mCaptcha](https://github.com/mCaptcha/mCaptcha)** with added support for custom branding via environment variables.
+> **This is a fork of [mCaptcha/mCaptcha](https://github.com/mCaptcha/mCaptcha).**
 
 ### What this fork adds
 
-This fork introduces configurable widget branding so you can customize the logo, brand name, and brand link displayed in the mCaptcha CAPTCHA widget. It also supports auto-detecting the embedding site's favicon for use as the widget logo.
+When a site embeds the mCaptcha widget, this fork can automatically display that site's favicon in the widget instead of the default mCaptcha logo. It detects the embedding site's domain via `document.referrer` and fetches the favicon from configurable sources.
+
+By default, only the site's own `/favicon.ico` is tried (no third-party requests). You can optionally enable external favicon services (DuckDuckGo, Google, Icon Horse, Favicone) as fallbacks if the direct favicon isn't available.
+
+It also exposes a few environment variables to override the widget's logo URL, brand name, and brand link.
 
 #### Environment variables
 
 | Variable | Description |
 |---|---|
-| `MCAPTCHA_logo_URL` | Custom logo URL — overrides the default mCaptcha logo in the widget |
+| `MCAPTCHA_logo_USE_FAVICON` | Set to `true` to auto-detect the embedding site's favicon as the widget logo. Falls back to `MCAPTCHA_logo_URL` (if set) or the default mCaptcha logo on failure. |
+| `MCAPTCHA_logo_FAVICON_PROVIDERS` | Comma-separated list of favicon sources to try, in order. Available: `direct`, `duckduckgo`, `google`, `iconhorse`, `favicone`, `all`. Default: `direct` (only fetches `/favicon.ico` from the site itself — no third-party requests). |
+| `MCAPTCHA_logo_URL` | Static logo URL — overrides the default mCaptcha logo in the widget |
 | `MCAPTCHA_logo_BRAND_NAME` | Brand name shown under the logo (defaults to `"mCaptcha"`) |
 | `MCAPTCHA_logo_BRAND_LINK` | URL the widget logo links to (defaults to mCaptcha homepage) |
-| `MCAPTCHA_logo_USE_FAVICON` | Set to `true` to auto-detect the embedding site's favicon as the widget logo. Falls back to `MCAPTCHA_logo_URL` (if set) or the default mCaptcha logo on failure. |
 
 ### Docker image
 
@@ -77,8 +82,9 @@ services:
       MCAPTCHA_redis_POOL: "4"
       # Captcha
       MCAPTCHA_captcha_SALT: change-me-to-a-random-string-min-32-chars
-      # Branding (optional)
+      # Favicon / Branding (optional)
       MCAPTCHA_logo_USE_FAVICON: "true"
+      # MCAPTCHA_logo_FAVICON_PROVIDERS: "direct"  # default; use "all" to enable third-party fallbacks
       MCAPTCHA_logo_BRAND_NAME: "Secured by mCaptcha"
       MCAPTCHA_logo_BRAND_LINK: "https://mcaptcha.org"
       # MCAPTCHA_logo_URL: "https://example.com/your-logo.png"

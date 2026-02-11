@@ -106,6 +106,7 @@ pub struct Logo {
     pub brand_name: Option<String>,
     pub brand_link: Option<String>,
     pub use_favicon: Option<bool>,
+    pub favicon_providers: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize, Eq, PartialEq)]
@@ -124,7 +125,7 @@ pub struct Settings {
     pub logo: Option<Logo>,
 }
 
-const ENV_VAR_CONFIG: [(&str, &str); 36] = [
+const ENV_VAR_CONFIG: [(&str, &str); 37] = [
     /* top-level */
     ("debug", "MCAPTCHA_debug"),
     ("commercial", "MCAPTCHA_commercial"),
@@ -179,6 +180,7 @@ const ENV_VAR_CONFIG: [(&str, &str); 36] = [
     ("logo.brand_name", "MCAPTCHA_logo_BRAND_NAME"),
     ("logo.brand_link", "MCAPTCHA_logo_BRAND_LINK"),
     ("logo.use_favicon", "MCAPTCHA_logo_USE_FAVICON"),
+    ("logo.favicon_providers", "MCAPTCHA_logo_FAVICON_PROVIDERS"),
 
 ];
 
@@ -229,6 +231,9 @@ impl Settings {
     }
     pub fn get_use_favicon(&self) -> bool {
         self.logo.as_ref().and_then(|l| l.use_favicon).unwrap_or(false)
+    }
+    pub fn get_favicon_providers(&self) -> &str {
+        self.logo.as_ref().and_then(|l| l.favicon_providers.as_deref()).unwrap_or("direct")
     }
 
     pub fn new() -> Result<Self, ConfigError> {

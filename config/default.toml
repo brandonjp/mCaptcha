@@ -80,13 +80,18 @@ password = "password"
 # URL the widget logo links to (defaults to mCaptcha homepage)
 #brand_link = "https://yourbrand.com"
 # Auto-detect and display the embedding site's favicon as the widget logo.
-# Uses document.referrer to find the parent site, then tries:
-#   1. https://{domain}/favicon.ico
-#   2. https://icons.duckduckgo.com/ip3/{domain}.ico
-#   3. https://www.google.com/s2/favicons?domain={domain}&sz=64
+# Uses document.referrer to find the parent site's domain, then tries
+# the providers listed in favicon_providers (see below).
 # Falls back to url (if set) or default mCaptcha logo on failure.
 # Env var: MCAPTCHA_logo_USE_FAVICON=true
 #use_favicon = true
+# Comma-separated list of favicon providers to try (in order).
+# Available: direct, duckduckgo, google, iconhorse, favicone, all
+# "direct" only fetches /favicon.ico from the site itself (no third-party requests).
+# "all" expands to: direct,duckduckgo,google,iconhorse,favicone
+# Default: "direct"
+# Env var: MCAPTCHA_logo_FAVICON_PROVIDERS=direct
+#favicon_providers = "direct"
 
 #[survey]
 #nodes = ["http://localhost:7001"]
