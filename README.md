@@ -22,6 +22,85 @@ Proof of work based, privacy respecting CAPTCHA system with a kickass UX.
 
 </div>
 
+---
+
+## Fork: Custom Branding & Favicon Support
+
+> **This is a fork of [mCaptcha/mCaptcha](https://github.com/mCaptcha/mCaptcha)** with added support for custom branding via environment variables.
+
+### What this fork adds
+
+This fork introduces configurable widget branding so you can customize the logo, brand name, and brand link displayed in the mCaptcha CAPTCHA widget. It also supports auto-detecting the embedding site's favicon for use as the widget logo.
+
+#### Environment variables
+
+| Variable | Description |
+|---|---|
+| `MCAPTCHA_logo_URL` | Custom logo URL — overrides the default mCaptcha logo in the widget |
+| `MCAPTCHA_logo_BRAND_NAME` | Brand name shown under the logo (defaults to `"mCaptcha"`) |
+| `MCAPTCHA_logo_BRAND_LINK` | URL the widget logo links to (defaults to mCaptcha homepage) |
+| `MCAPTCHA_logo_USE_FAVICON` | Set to `true` to auto-detect the embedding site's favicon as the widget logo. Falls back to `MCAPTCHA_logo_URL` (if set) or the default mCaptcha logo on failure. |
+
+### Docker image
+
+This fork publishes Docker images to GitHub Container Registry:
+
+```
+ghcr.io/brandonjp/mcaptcha:latest
+```
+
+#### Docker Compose example
+
+```yaml
+version: "3.9"
+
+services:
+  mcaptcha:
+    image: ghcr.io/brandonjp/mcaptcha:latest
+    ports:
+      - 7000:7000
+    depends_on:
+      - mcaptcha_postgres
+      - mcaptcha_redis
+    environment:
+      # Server
+      MCAPTCHA_server_DOMAIN: mcaptcha.example.com
+      MCAPTCHA__server_COOKIE_SECRET: change-me-to-a-random-string-min-32-chars
+      MCAPTCHA__server_IP: 0.0.0.0
+      MCAPTCHA__server_PROXY_HAS_TLS: "true"
+      PORT: "7000"
+      # Database
+      DATABASE_URL: postgres://mcaptcha:password@mcaptcha_postgres:5432/mcaptcha
+      MCAPTCHA_database_POOL: "4"
+      # Redis
+      MCAPTCHA_redis_URL: redis://mcaptcha_redis
+      MCAPTCHA_redis_POOL: "4"
+      # Captcha
+      MCAPTCHA_captcha_SALT: change-me-to-a-random-string-min-32-chars
+      # Branding (optional)
+      MCAPTCHA_logo_USE_FAVICON: "true"
+      MCAPTCHA_logo_BRAND_NAME: "Secured by mCaptcha"
+      MCAPTCHA_logo_BRAND_LINK: "https://mcaptcha.org"
+      # MCAPTCHA_logo_URL: "https://example.com/your-logo.png"
+
+  mcaptcha_postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: mcaptcha
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mcaptcha
+    volumes:
+      - mcaptcha-data:/var/lib/postgresql
+
+  mcaptcha_redis:
+    image: mcaptcha/cache:latest
+
+volumes:
+  mcaptcha-data:
+```
+
+---
+
 **Skip to [demo](#demo)**
 
 [mCaptcha](https://mcaptcha.org) is a privacy respecting, _free_ CAPTCHA
