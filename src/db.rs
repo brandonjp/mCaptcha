@@ -23,7 +23,11 @@ pub mod pg {
             disable_logging: !settings.debug,
         });
         let db = connection_options.connect().await.unwrap();
-        db.migrate().await.unwrap();
+        db.migrate().await.expect(
+            "Failed to run database migrations. If this is a VersionMissing error, \
+             your database may contain migration records from a newer version of mCaptcha. \
+             You can fix this by deleting the unknown row from the _sqlx_migrations table.",
+        );
         Box::new(db)
     }
 }
@@ -43,7 +47,11 @@ pub mod maria {
             disable_logging: !settings.debug,
         });
         let db = connection_options.connect().await.unwrap();
-        db.migrate().await.unwrap();
+        db.migrate().await.expect(
+            "Failed to run database migrations. If this is a VersionMissing error, \
+             your database may contain migration records from a newer version of mCaptcha. \
+             You can fix this by deleting the unknown row from the _sqlx_migrations table.",
+        );
         Box::new(db)
     }
 }
