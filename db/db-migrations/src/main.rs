@@ -23,10 +23,9 @@ async fn postgres_migrate() {
         .await
         .expect("Unable to form database pool");
 
-    sqlx::migrate!("../db-sqlx-postgres/migrations/")
-        .run(&db)
-        .await
-        .unwrap();
+    let mut migrator = sqlx::migrate!("../db-sqlx-postgres/migrations/");
+    migrator.set_ignore_missing(true);
+    migrator.run(&db).await.unwrap();
 }
 
 async fn maria_migrate() {
@@ -37,8 +36,7 @@ async fn maria_migrate() {
         .await
         .expect("Unable to form database pool");
 
-    sqlx::migrate!("../db-sqlx-maria/migrations/")
-        .run(&db)
-        .await
-        .unwrap();
+    let mut migrator = sqlx::migrate!("../db-sqlx-maria/migrations/");
+    migrator.set_ignore_missing(true);
+    migrator.run(&db).await.unwrap();
 }
