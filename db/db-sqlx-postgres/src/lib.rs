@@ -79,7 +79,9 @@ use dev::*;
 #[async_trait]
 impl Migrate for Database {
     async fn migrate(&self) -> DBResult<()> {
-        sqlx::migrate!("./migrations/")
+        let mut migrator = sqlx::migrate!("./migrations/");
+        migrator.set_ignore_missing(true);
+        migrator
             .run(&self.pool)
             .await
             .map_err(|e| DBError::DBError(Box::new(e)))?;
